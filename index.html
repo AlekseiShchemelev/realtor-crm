@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RealtorCRM</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Навигационная панель -->
+      <nav class="navbar">
+        <div class="nav-brand">RealtorCRM</div>
+        <div class="nav-links">
+          <button class="nav-link active" data-page="clients">Клиенты</button>
+          <button class="nav-link" data-page="calendar">Календарь</button>
+          <button class="nav-link" data-page="history">История</button>
+        </div>
+        <div class="nav-profile">
+          <button id="profile-btn">Профиль</button>
+        </div>
+      </nav>
+
+      <!-- Основное содержимое -->
+      <main class="main-content">
+        <!-- Страница клиентов -->
+        <section id="clients-page" class="page active">
+          <div class="page-header">
+            <h1>Клиенты</h1>
+            <p>Управляйте списком ваших клиентов и встреч.</p>
+          </div>
+
+          <div class="search-container">
+            <input
+              type="text"
+              id="client-search"
+              placeholder="Поиск по имени, адресу или телефону..."
+            />
+          </div>
+
+          <div class="clients-table-container">
+            <table class="clients-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="select-all" /></th>
+                  <th>Фото</th>
+                  <th>ФИО</th>
+                  <th>Телефон</th>
+                  <th>Адрес</th>
+                  <th>Дата встречи</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="clients-list">
+                <!-- Список клиентов будет загружен сюда -->
+              </tbody>
+            </table>
+            <div id="empty-clients-message" class="empty-message">
+              Список клиентов пуст.
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button id="add-client-btn" class="btn-primary">
+              Добавить клиента
+            </button>
+          </div>
+        </section>
+
+        <!-- Страница календаря -->
+        <section id="calendar-page" class="page">
+          <div class="page-header">
+            <h1>Календарь</h1>
+            <p>Выберите дату для просмотра встреч.</p>
+          </div>
+
+          <div class="calendar-container">
+            <div class="calendar-header">
+              <button id="prev-month">&lt;</button>
+              <h2 id="current-month">Сентябрь 2025</h2>
+              <button id="next-month">&gt;</button>
+            </div>
+
+            <div class="calendar">
+              <div class="calendar-weekdays">
+                <div>Пн</div>
+                <div>Вт</div>
+                <div>Ср</div>
+                <div>Чт</div>
+                <div>Пт</div>
+                <div>Сб</div>
+                <div>Вс</div>
+              </div>
+              <div id="calendar-days" class="calendar-days">
+                <!-- Дни календаря будут загружены сюда -->
+              </div>
+            </div>
+          </div>
+
+          <div class="meetings-section">
+            <h2>Встречи на неделю</h2>
+            <p>Список запланированных встреч на ближайшие 7 дней.</p>
+            <div id="weekly-meetings">
+              <!-- Список встреч будет загружен сюда -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Страница истории -->
+        <section id="history-page" class="page">
+          <div class="page-header">
+            <h1>История действий</h1>
+            <p>Здесь отображаются все изменения в списке клиентов.</p>
+          </div>
+
+          <div class="history-actions">
+            <button id="export-excel" class="btn-secondary">
+              Экспорт в Excel
+            </button>
+            <button id="clear-all-data" class="btn-danger">
+              Очистить все данные
+            </button>
+          </div>
+
+          <div id="history-list" class="history-list">
+            <!-- История действий будет загружена сюда -->
+          </div>
+          <div id="empty-history-message" class="empty-message">
+            История действий пока пуста.
+          </div>
+        </section>
+      </main>
+
+      <!-- Модальные окна -->
+      <div id="modal-overlay" class="modal-overlay">
+        <!-- Модальное окно добавления/редактирования клиента -->
+        <div id="client-modal" class="modal">
+          <div class="modal-header">
+            <h3 id="client-modal-title">Добавить клиента</h3>
+            <button class="close-modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="client-form">
+              <div class="form-group">
+                <label for="client-photo">Фото</label>
+                <div id="client-photo-preview" class="photo-preview">
+                  <img
+                    id="default-client-photo"
+                    src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNlMWUxZTEiLz4KPHBhdGggZD0iTTQwIDQ0QzQ0LjQxODMgNDQgNDggNDAuNDE4MyA0OCAzNkM0OCAzMS41ODE3IDQ0LjQxODMgMjggNDAgMjhDMzUuNTgxNyAyOCAzMiAzMS41ODE3IDMyIDM2QzMyIDQwLjQxODMgMzUuNTgxNyA0NCA0MCA0NFoiIGZpbGw9IiM5OTk5OTkiLz4KPHBhdGggZD0iTTMwIDUyQzMwIDQ4LjY5NTcgMzIuNjk1NyA0NiAzNiA0Nkg0NEM0Ny4zMDQzIDQ2IDUwIDQ4LjY5NTcgNTAgNTJWNTVIMzBWNTJaIiBmaWxsPSIjOTk5OTk5Ii8+Cjwvc3ZnPgo="
+                    alt="Фото по умолчанию"
+                    class="default-photo"
+                  />
+                  <img
+                    id="custom-client-photo"
+                    src=""
+                    alt="Фото клиента"
+                    class="custom-photo"
+                    style="display: none"
+                  />
+                  <button
+                    type="button"
+                    id="remove-client-photo"
+                    class="remove-photo-btn"
+                    style="display: none"
+                  >
+                    ×
+                  </button>
+                </div>
+                <input type="file" id="client-photo" accept="image/*" />
+                <small class="file-hint"
+                  >Максимальный размер: 5MB. Поддерживаемые форматы: JPEG, PNG,
+                  GIF</small
+                >
+              </div>
+              <div class="form-group">
+                <label for="client-name">ФИО</label>
+                <input type="text" id="client-name" required />
+              </div>
+              <div class="form-group">
+                <label for="client-phone">Телефон</label>
+                <input type="tel" id="client-phone" required />
+              </div>
+              <div class="form-group">
+                <label for="client-address">Адрес</label>
+                <input type="text" id="client-address" required />
+              </div>
+              <div class="form-group">
+                <label for="meeting-date">Дата встречи</label>
+                <input type="datetime-local" id="meeting-date" />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary close-modal">Отмена</button>
+            <button id="save-client" class="btn-primary">Сохранить</button>
+          </div>
+        </div>
+        <!-- Модальное окно просмотра фото -->
+        <div id="photo-viewer-modal" class="modal">
+          <div class="modal-header">
+            <h3>Просмотр фото</h3>
+            <button class="close-modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="photo-viewer-container">
+              <img
+                id="full-size-photo"
+                src=""
+                alt="Фото клиента"
+                style="
+                  max-width: 100%;
+                  max-height: 70vh;
+                  display: block;
+                  margin: 0 auto;
+                "
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary close-modal">Закрыть</button>
+          </div>
+        </div>
+
+        <!-- Модальное окно деталей клиента -->
+        <div id="client-details-modal" class="modal">
+          <div class="modal-header">
+            <h3 id="client-details-name">Щемелев Алексей Владимирович</h3>
+            <button class="close-modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="client-info">
+              <div class="client-photo-container">
+                <img id="details-client-photo" src="" alt="Фото клиента" />
+              </div>
+              <div class="client-details">
+                <p>
+                  <strong>Телефон:</strong>
+                  <span id="details-client-phone">+79634444996</span>
+                </p>
+                <p>
+                  <strong>Адрес:</strong>
+                  <span id="details-client-address">Обходной пер 40</span>
+                </p>
+                <p>
+                  <strong>Дата встречи:</strong>
+                  <span id="details-meeting-date"
+                    >26 сентября 2025 г. в 22:03</span
+                  >
+                </p>
+              </div>
+            </div>
+            <div class="client-actions">
+              <button class="btn-secondary" id="edit-client-btn">
+                Изменить данные
+              </button>
+              <button class="btn-secondary" id="show-on-map">
+                Показать на карте
+              </button>
+              <button class="btn-primary" id="meeting-completed">
+                Встреча состоялась
+              </button>
+              <button class="btn-warning" id="meeting-cancelled">
+                Встреча отменена
+              </button>
+              <button class="btn-danger" id="delete-client-btn">Удалить</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/data/storage.js"></script>
+    <script src="js/clients.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
