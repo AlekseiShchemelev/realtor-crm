@@ -576,6 +576,21 @@ body {
   .clients-cards {
     display: block;
   }
+
+  #photo-viewer-modal .modal {
+    width: 95%;
+    max-width: none;
+    margin: 10px;
+  }
+
+  #photo-viewer-modal .modal-body {
+    padding: 10px;
+  }
+
+  #full-size-photo {
+    max-width: 95vw !important;
+    max-height: 80vh !important;
+  }
 }
 
 /* Показываем таблицу только на десктопе */
@@ -587,4 +602,13 @@ body {
   .clients-table {
     display: table;
   }
+}
+
+.client-card .client-photo {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.client-card .client-photo:hover {
+  transform: scale(1.05);
 }

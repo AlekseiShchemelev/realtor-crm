@@ -3,6 +3,7 @@ const ClientsModule = {
   clients: [],
   currentEditingId: null,
   currentPhotoFile: null,
+  detailsPhotoHandler: null,
 
   init: function () {
     this.setupEventListeners();
@@ -129,6 +130,9 @@ const ClientsModule = {
       `
       )
       .join("");
+    setTimeout(() => {
+      this.setupPhotoClickHandlers();
+    }, 0);
   },
 
   renderMobileCards: function () {
@@ -190,6 +194,10 @@ const ClientsModule = {
       `
       )
       .join("");
+
+    setTimeout(() => {
+      this.setupPhotoClickHandlers();
+    }, 0);
   },
 
   getDefaultPhoto: function () {
@@ -569,6 +577,7 @@ const ClientsModule = {
       .join("");
 
     this.addClientActionHandlers();
+    this.setupPhotoClickHandlers();
   },
 
   toggleSelectAll: function (checked) {
@@ -588,6 +597,18 @@ const ClientsModule = {
     fullSizePhoto.src = photoUrl || this.getDefaultPhoto();
     fullSizePhoto.alt = `Фото клиента ${clientName}`;
 
+    // Добавляем стили для мобильных
+    if (window.innerWidth <= 768) {
+      fullSizePhoto.style.maxWidth = "95vw";
+      fullSizePhoto.style.maxHeight = "80vh";
+      fullSizePhoto.style.cursor = "pointer";
+
+      // Закрытие по клику на фото на мобильных
+      fullSizePhoto.onclick = () => {
+        this.closeAllModals();
+      };
+    }
+
     // Показываем модальное окно
     photoModal.style.display = "block";
     document.getElementById("modal-overlay").classList.add("active");
@@ -597,14 +618,37 @@ const ClientsModule = {
   setupPhotoClickHandlers: function () {
     const self = this;
 
-    // Обработчики для фото в таблице клиентов
+    // Обработчики для фото в таблице клиентов (десктоп)
     document
       .querySelectorAll(".clients-table .client-photo")
       .forEach((photo) => {
         photo.addEventListener("click", function () {
-          const clientId = this.closest("tr")
-            .querySelector(".client-checkbox")
-            .getAttribute("data-id");
+          const row = this.closest("tr");
+          if (!row) return;
+
+          const checkbox = row.querySelector(".client-checkbox");
+          if (!checkbox) return;
+
+          const clientId = checkbox.getAttribute("data-id");
+          const client = self.clients.find((c) => c.id === clientId);
+          if (client) {
+            self.viewPhoto(client.photo, client.name);
+          }
+        });
+      });
+
+    // Обработчики для фото в карточках клиентов (мобильные)
+    document
+      .querySelectorAll(".clients-cards .client-photo")
+      .forEach((photo) => {
+        photo.addEventListener("click", function () {
+          const card = this.closest(".client-card");
+          if (!card) return;
+
+          const viewButton = card.querySelector(".view-client");
+          if (!viewButton) return;
+
+          const clientId = viewButton.getAttribute("data-id");
           const client = self.clients.find((c) => c.id === clientId);
           if (client) {
             self.viewPhoto(client.photo, client.name);
@@ -615,12 +659,17 @@ const ClientsModule = {
     // Обработчик для фото в деталях клиента
     const detailsPhoto = document.getElementById("details-client-photo");
     if (detailsPhoto) {
-      detailsPhoto.addEventListener("click", function () {
+      // Удаляем старый обработчик перед добавлением нового
+      detailsPhoto.removeEventListener("click", this.detailsPhotoHandler);
+
+      this.detailsPhotoHandler = function () {
         const clientName = document.getElementById(
           "client-details-name"
         ).textContent;
         self.viewPhoto(this.src, clientName);
-      });
+      };
+
+      detailsPhoto.addEventListener("click", this.detailsPhotoHandler);
     }
   },
 };
