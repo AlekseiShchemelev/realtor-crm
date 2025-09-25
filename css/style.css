@@ -134,11 +134,17 @@ body {
 }
 
 .client-photo {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s;
   border: 2px solid #e0e0e0;
+}
+
+.client-photo:hover {
+  transform: scale(1.1);
 }
 
 /* Календарь */
@@ -378,7 +384,13 @@ body {
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s;
   border: 3px solid #3498db;
+}
+
+.client-photo-container img:hover {
+  transform: scale(1.1);
 }
 
 .client-details p {
@@ -401,63 +413,6 @@ body {
 
 .empty-message.active {
   display: block;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
-
-  .nav-links {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .main-content {
-    padding: 1rem;
-  }
-
-  .clients-table {
-    font-size: 0.9rem;
-  }
-
-  .clients-table th,
-  .clients-table td {
-    padding: 0.5rem;
-  }
-
-  .calendar-weekdays,
-  .calendar-days {
-    gap: 2px;
-  }
-
-  .history-actions {
-    flex-direction: column;
-  }
-
-  .client-info {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-/* Добавить в css/style.css */
-.modal {
-  background: white;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: none; /* По умолчанию скрыты */
-}
-
-.modal.active {
-  display: block; /* Показываем при активации */
 }
 
 /* Стили для превью фото */
@@ -522,30 +477,114 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Увеличиваем миниатюры в таблице для лучшей кликабельности */
-.client-photo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.2s;
+/* Карточки клиентов для мобильных */
+.clients-cards {
+  display: none;
 }
 
-.client-photo:hover {
-  transform: scale(1.1);
+.client-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Увеличиваем фото в деталях клиента */
-.client-photo-container img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.2s;
+.client-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-.client-photo-container img:hover {
-  transform: scale(1.1);
+.client-card-info {
+  flex: 1;
+}
+
+.client-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.client-card-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.client-card-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.client-card-detail strong {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+
+  .clients-table {
+    font-size: 0.9rem;
+  }
+
+  .clients-table th,
+  .clients-table td {
+    padding: 0.5rem;
+  }
+
+  .calendar-weekdays,
+  .calendar-days {
+    gap: 2px;
+  }
+
+  .history-actions {
+    flex-direction: column;
+  }
+
+  .client-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .clients-table-container {
+    overflow-x: visible;
+  }
+
+  .clients-table {
+    display: none;
+  }
+
+  .clients-cards {
+    display: block;
+  }
+}
+
+/* Показываем таблицу только на десктопе */
+@media (min-width: 769px) {
+  .clients-cards {
+    display: none;
+  }
+
+  .clients-table {
+    display: table;
+  }
 }

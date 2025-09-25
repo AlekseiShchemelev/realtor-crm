@@ -6,8 +6,13 @@ const ClientsModule = {
 
   init: function () {
     this.setupEventListeners();
-    this.setupKeyboardHandlers(); // Добавляем обработчики клавиатуры
+    this.setupKeyboardHandlers();
     this.loadClients();
+
+    // Обработчик изменения размера окна
+    window.addEventListener("resize", () => {
+      this.loadClients();
+    });
   },
 
   // Новый метод для обработки клавиатуры
@@ -68,42 +73,123 @@ const ClientsModule = {
 
     emptyMessage.classList.remove("active");
 
+    // Проверяем ширину экрана
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+      this.renderMobileCards();
+    } else {
+      this.renderDesktopTable();
+    }
+
+    this.addClientActionHandlers();
+    this.setupPhotoClickHandlers();
+  },
+
+  renderDesktopTable: function () {
+    // Показываем таблицу
+    const clientsTable = document.querySelector(".clients-table");
+    if (clientsTable) clientsTable.style.display = "table";
+
+    // Скрываем карточки
+    const cardsContainer = document.getElementById("clients-cards");
+    if (cardsContainer) cardsContainer.style.display = "none";
+
+    const clientsList = document.getElementById("clients-list");
     clientsList.innerHTML = this.clients
       .map(
         (client) => `
-              <tr>
-                  <td><input type="checkbox" class="client-checkbox" data-id="${
-                    client.id
-                  }"></td>
-                  <td>
-                    <img src="${client.photo || this.getDefaultPhoto()}" 
-                        alt="Фото ${client.name}" 
-                        class="client-photo"
-                        onerror="this.src='${this.getDefaultPhoto()}'">
-                  </td>
-                  <td>${client.name}</td>
-                  <td>${client.phone}</td>
-                  <td>${client.address}</td>
-                  <td>${
-                    client.meetingDate
-                      ? Utils.formatDate(client.meetingDate)
-                      : "Не назначена"
-                  }</td>
-                  <td>
-                      <button class="btn-secondary view-client" data-id="${
-                        client.id
-                      }">Просмотр</button>
-                      <button class="btn-secondary edit-client" data-id="${
-                        client.id
-                      }">Изменить</button>
-                  </td>
-              </tr>
-          `
+        <tr>
+          <td><input type="checkbox" class="client-checkbox" data-id="${
+            client.id
+          }"></td>
+          <td>
+            <img src="${client.photo || this.getDefaultPhoto()}" 
+                alt="Фото ${client.name}" 
+                class="client-photo"
+                onerror="this.src='${this.getDefaultPhoto()}'">
+          </td>
+          <td>${client.name}</td>
+          <td>${client.phone}</td>
+          <td>${client.address}</td>
+          <td>${
+            client.meetingDate
+              ? Utils.formatDate(client.meetingDate)
+              : "Не назначена"
+          }</td>
+          <td>
+            <button class="btn-secondary view-client" data-id="${
+              client.id
+            }">Просмотр</button>
+            <button class="btn-secondary edit-client" data-id="${
+              client.id
+            }">Изменить</button>
+          </td>
+        </tr>
+      `
       )
       .join("");
+  },
 
-    this.addClientActionHandlers();
-    this.setupPhotoClickHandlers(); // Добавляем обработчики кликов по фото
+  renderMobileCards: function () {
+    // Скрываем таблицу
+    const clientsTable = document.querySelector(".clients-table");
+    if (clientsTable) clientsTable.style.display = "none";
+
+    // Показываем контейнер карточек
+    let cardsContainer = document.getElementById("clients-cards");
+    if (!cardsContainer) {
+      cardsContainer = document.createElement("div");
+      cardsContainer.id = "clients-cards";
+      cardsContainer.className = "clients-cards";
+      document
+        .querySelector(".clients-table-container")
+        .appendChild(cardsContainer);
+    }
+
+    cardsContainer.style.display = "block";
+
+    // Очищаем и заполняем карточки
+    cardsContainer.innerHTML = this.clients
+      .map(
+        (client) => `
+        <div class="client-card">
+          <div class="client-card-header">
+            <img src="${client.photo || this.getDefaultPhoto()}" 
+                alt="Фото ${client.name}" 
+                class="client-photo"
+                onerror="this.src='${this.getDefaultPhoto()}'">
+            <div class="client-card-info">
+              <h4>${client.name}</h4>
+              <span>${client.phone}</span>
+            </div>
+          </div>
+          <div class="client-card-details">
+            <div class="client-card-detail">
+              <strong>Адрес:</strong>
+              <span>${client.address || "Не указан"}</span>
+            </div>
+            <div class="client-card-detail">
+              <strong>Встреча:</strong>
+              <span>${
+                client.meetingDate
+                  ? Utils.formatDate(client.meetingDate)
+                  : "Не назначена"
+              }</span>
+            </div>
+          </div>
+          <div class="client-card-actions">
+            <button class="btn-secondary view-client" data-id="${
+              client.id
+            }">Просмотр</button>
+            <button class="btn-secondary edit-client" data-id="${
+              client.id
+            }">Изменить</button>
+          </div>
+        </div>
+      `
+      )
+      .join("");
   },
 
   getDefaultPhoto: function () {
